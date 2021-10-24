@@ -1,2 +1,22 @@
 
 .DS_Store
+
+# dependencies
+App/node_modules
+App/.pnp
+App/.pnp.js
+
+# testing
+App/coverage
+
+# production
+App/build
+
+# misc
+App/.DS_Store
+App/.env.local
+App/.env.development.local
+App/.env.test.local
+App/.env.production.local
+
+App/npm-debug.log*
