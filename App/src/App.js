@@ -1,5 +1,7 @@
-import React from 'react';
+import React from 'react'
 import Web3 from 'web3'
+import Login from './Pages/Login.js'
+
 
 class App extends React.Component {
 
@@ -21,10 +23,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="container">
-        <h1>Hello World</h1>
-        <h2>{this.state.account}</h2>
-      </div>
+      <Login/>
       )
   }
 }
