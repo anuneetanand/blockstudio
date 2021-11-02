@@ -27,13 +27,16 @@ contract blockstudio {
     mapping(address => Artist) allArtists;
     mapping(address => Audience) allAudience;
 
+    address public owner;
+
     constructor() {
         audienceIDTracker = 0;
         artistIDTracker = 0;
+        owner = msg.sender;
     }
 
-    function checkUser() public view returns (UserType) {
-        return identifyUser[msg.sender];
+    function checkUser() external view returns (UserType) {
+        return identifyUser[owner];
     }
 
     function addNewArtist(string memory _name) public {
@@ -44,8 +47,8 @@ contract blockstudio {
         newArtist.ArtistID = artistIDTracker;
         newArtist.rating = 0;
 
-        allArtists[msg.sender] = newArtist;
-        identifyUser[msg.sender] = UserType.ARTIST;
+        allArtists[owner] = newArtist;
+        identifyUser[owner] = UserType.ARTIST;
     }
 
     function addNewAudience(string memory _name) public {
@@ -55,8 +58,8 @@ contract blockstudio {
         newAudience.name = _name;
         newAudience.AudienceID = audienceIDTracker;
 
-        allAudience[msg.sender] = newAudience;
-        identifyUser[msg.sender] = UserType.AUDIENCE;
+        allAudience[owner] = newAudience;
+        identifyUser[owner] = UserType.AUDIENCE;
     }
 
     function getAudienceDetails()
@@ -69,9 +72,9 @@ contract blockstudio {
         )
     {
         return (
-            allAudience[msg.sender].name,
-            allAudience[msg.sender].AudienceID,
-            allAudience[msg.sender].songsPurchased
+            allAudience[owner].name,
+            allAudience[owner].AudienceID,
+            allAudience[owner].songsPurchased
         );
     }
 
@@ -86,10 +89,10 @@ contract blockstudio {
         )
     {
         return (
-            allArtists[msg.sender].name,
-            allArtists[msg.sender].ArtistID,
-            allArtists[msg.sender].rating,
-            allArtists[msg.sender].songsPublished
+            allArtists[owner].name,
+            allArtists[owner].ArtistID,
+            allArtists[owner].rating,
+            allArtists[owner].songsPublished
         );
     }
 }

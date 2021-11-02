@@ -4,7 +4,6 @@ import Logo from "../Assets/logo.png"
 import SwitchSelector from "react-switch-selector"
 import contract from 'truffle-contract'
 import contractMeta from "../build/contracts/blockstudio.json"
-
 class Login extends React.Component {
 
   constructor(props){
@@ -22,27 +21,27 @@ class Login extends React.Component {
 
   componentDidMount(){
     this.loadBlockchain()
+    console.log(this.state.type)
     this.LoginUser()
   }
 
   LoginUser = async () => {
       const contractInstance = await this.contract.deployed()
-      let val
-      contractInstance.checkUser({from : this.state.account}).then((x)=>{ val = x})
-      console.log("x")
-      console.log(val)
-      console.log("y")
+      let val = "0"
+      await contractInstance.checkUser().then((x)=>{ val = x.toString()})
       this.setState({type: val})
+      console.log("lol")
+      console.log(this.state.account)
+      console.log(val)
   }
 
   RegisterUser = async () =>{
     this.setState({type:this.state.choice})
     const contractInstance = await this.contract.deployed()
-    console.log(contractInstance)
     if (this.state.type === "1")
-      contractInstance.addNewArtist("a",{from : this.state.account})
+      contractInstance.addNewArtist("aaa",{from:this.state.account})
     if (this.state.type === "2")
-      contractInstance.addNewAudience("b",{from : this.state.account})
+      contractInstance.addNewAudience("bbb",{from:this.state.account})
   }
 
   render(){
