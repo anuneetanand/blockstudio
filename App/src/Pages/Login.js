@@ -4,6 +4,10 @@ import Logo from "../Assets/logo.png"
 import SwitchSelector from "react-switch-selector"
 import contract from 'truffle-contract'
 import contractMeta from "../build/contracts/blockstudio.json"
+
+import {create} from 'ipfs-http-client'
+const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
+
 class Login extends React.Component {
 
   constructor(props){
@@ -11,7 +15,7 @@ class Login extends React.Component {
     this.web3 = new Web3(Web3.givenProvider || "http://localhost:7545")
     this.contract = contract(contractMeta)
     this.contract.setProvider(this.web3.currentProvider)
-    this.state = { account : "", type : "0", choice : "1"}
+    this.state = { account : "", type : "0", choice : "1", hash: ""}
   }
 
   async loadBlockchain(){
@@ -41,17 +45,52 @@ class Login extends React.Component {
       contractInstance.addNewAudience("bbb",{from:this.state.account})
   }
 
+  captureFile = (event)=>{
+    event.preventDefault();
+    const file = event.target.files[0]
+    const file_reader = new window.FileReader()
+    file_reader.readAsArrayBuffer(file)
+    file_reader.onloadend = () =>{
+      this.setState({buffer: Buffer.from(file_reader.result)})
+    }
+  }
+  onSubmitClick = async (event)=>{
+      event.preventDefault()
+      if(this.state.buffer){
+        const file = await ipfs.add(this.state.buffer)
+        const imageHash = file["path"];
+        this.setState({hash: imageHash});
+      }
+    }
+
+
+
   render(){
 
 
     if (this.state.type === "1" ){
       return (
-        <div style = {styles.body}>
+        <div style = {styles.body}> 
           <div style = {styles.main}>
             <h2> Artist </h2>
+                  <main role="main">
+                        <h4>IPFS HASH: {this.state.hash}</h4>
+                      <br></br>
+                      <div align = 'center'>
+                        <img align = 'center' src={`https://ipfs.infura.io/ipfs/${this.state.hash}`}  alt="uploadedimage" />
+                        <br></br>
+                        <div className="container-form">
+                        <form>
+                          <input type="file" onChange={this.captureFile}></input>
+                          <input type="submit" onClick={this.onSubmitClick}></input>
+                        </form>
+                        </div>
+                      </div>
+
+                  </main>
+                </div>
           </div>
-        </div>
-      )
+          )
     }
 
     else if (this.state.type === "2"){
