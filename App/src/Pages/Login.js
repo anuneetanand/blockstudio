@@ -4,7 +4,6 @@ import Logo from "../Assets/logo.png"
 import SwitchSelector from "react-switch-selector"
 import contract from 'truffle-contract'
 import contractMeta from "../build/contracts/blockstudio.json"
-
 import {create} from 'ipfs-http-client'
 const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
 
@@ -32,7 +31,6 @@ class Login extends React.Component {
       const contractInstance = await this.contract.deployed()
       let val = "0"
       await contractInstance.checkUser({from:this.state.account}).then((x)=>{ val = x.toString()})
-      
       this.setState({type: val})
   }
 
@@ -40,9 +38,9 @@ class Login extends React.Component {
     this.setState({type:this.state.choice})
     const contractInstance = await this.contract.deployed()
     if (this.state.type === "1")
-      contractInstance.addNewArtist("aaa",{from:this.state.account})
+      contractInstance.addNewArtist("Artist",{from:this.state.account})
     if (this.state.type === "2")
-      contractInstance.addNewAudience("bbb",{from:this.state.account})
+      contractInstance.addNewAudience("Audience",{from:this.state.account})
   }
 
   captureFile = (event)=>{
@@ -63,10 +61,7 @@ class Login extends React.Component {
       }
     }
 
-
-
   render(){
-
 
     if (this.state.type === "1" ){
       return (
@@ -86,7 +81,6 @@ class Login extends React.Component {
                         </form>
                         </div>
                       </div>
-
                   </main>
                 </div>
           </div>
