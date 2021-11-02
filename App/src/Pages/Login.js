@@ -21,18 +21,15 @@ class Login extends React.Component {
 
   componentDidMount(){
     this.loadBlockchain()
-    console.log(this.state.type)
     this.LoginUser()
   }
 
   LoginUser = async () => {
       const contractInstance = await this.contract.deployed()
       let val = "0"
-      await contractInstance.checkUser().then((x)=>{ val = x.toString()})
+      await contractInstance.checkUser({from:this.state.account}).then((x)=>{ val = x.toString()})
+      
       this.setState({type: val})
-      console.log("lol")
-      console.log(this.state.account)
-      console.log(val)
   }
 
   RegisterUser = async () =>{
@@ -45,6 +42,7 @@ class Login extends React.Component {
   }
 
   render(){
+
 
     if (this.state.type === "1" ){
       return (
