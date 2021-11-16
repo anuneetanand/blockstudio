@@ -1,11 +1,15 @@
 import React from "react"
-import Web3 from 'web3'
+import {COLORS} from "./Colors"
+import Artist from "./Artist"
+import Audience from "./Audience"
 import Logo from "../Assets/logo.png"
-import SwitchSelector from "react-switch-selector"
-import contract from 'truffle-contract'
 import contractMeta from "../Build/blockstudio.json"
+
+import Web3 from 'web3'
+import contract from 'truffle-contract'
 import {create} from 'ipfs-http-client'
-const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
+import Loader from "react-loader-spinner"
+import SwitchSelector from "react-switch-selector"
 
 class Login extends React.Component {
 
@@ -14,7 +18,13 @@ class Login extends React.Component {
     this.web3 = new Web3(Web3.givenProvider || "http://localhost:7545")
     this.contract = contract(contractMeta)
     this.contract.setProvider(this.web3.currentProvider)
-    this.state = { account : "", type : "0", choice : "1", hash: ""}
+    this.state = { account : "", type : "", choice : "1", ipfs : ""}
+  }
+
+  componentDidMount(){
+    this.loadBlockchain().then(() => console.log("Loaded Blockchain"))
+    this.loadIPFS().then(() => console.log("Loaded IPFS"))
+    this.loginUser().then(() => console.log("Login Successful"))
   }
 
   async loadBlockchain(){
@@ -22,130 +32,99 @@ class Login extends React.Component {
     this.setState({account:accounts[0]})
   }
 
-  componentDidMount(){
-    this.loadBlockchain()
-    this.LoginUser()
+  async loadIPFS(){
+    const conn = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
+    this.setState({ipfs:conn})
   }
 
-  LoginUser = async () => {
-      const contractInstance = await this.contract.deployed()
+  loginUser = async () => {
       let val = "0"
+      const contractInstance = await this.contract.deployed()
       await contractInstance.checkUser({from:this.state.account}).then((x)=>{ val = x.toString()})
       this.setState({type: val})
   }
 
-  RegisterUser = async () =>{
-    this.setState({type:this.state.choice})
+  registerUser = async () =>{
     const contractInstance = await this.contract.deployed()
-    if (this.state.type === "1")
-      contractInstance.addNewArtist("Artist",{from:this.state.account})
-    if (this.state.type === "2")
-      contractInstance.addNewAudience("Audience",{from:this.state.account})
+    if (this.state.choice === "1")
+      await contractInstance.addNewArtist("Artist",{from:this.state.account}).then(() => this.loginUser())
+    if (this.state.choice === "2")
+      await contractInstance.addNewAudience("Audience",{from:this.state.account}).then(() => this.loginUser())
   }
-
-  captureFile = (event)=>{
-    event.preventDefault();
-    const file = event.target.files[0]
-    const file_reader = new window.FileReader()
-    file_reader.readAsArrayBuffer(file)
-    file_reader.onloadend = () =>{
-      this.setState({buffer: Buffer.from(file_reader.result)})
-    }
-  }
-  onSubmitClick = async (event)=>{
-      event.preventDefault()
-      if(this.state.buffer){
-        const file = await ipfs.add(this.state.buffer)
-        const imageHash = file["path"];
-        this.setState({hash: imageHash});
-      }
-    }
 
   render(){
 
-    if (this.state.type === "1" ){
+    if (this.state.type === "0" ){
       return (
-        <div style = {styles.body}> 
-          <div style = {styles.main}>
-            <h2> Artist </h2>
-                  <main role="main">
-                        <h4>IPFS HASH: {this.state.hash}</h4>
-                      <br></br>
-                      <div align = 'center'>
-                        <img align = 'center' src={`https://ipfs.infura.io/ipfs/${this.state.hash}`}  alt="uploadedimage" />
-                        <br></br>
-                        <div className="container-form">
-                        <form>
-                          <input type="file" onChange={this.captureFile}></input>
-                          <input type="submit" onClick={this.onSubmitClick}></input>
-                        </form>
-                        </div>
-                      </div>
-                  </main>
-                </div>
+        <div style = {styles.main}>
+          <img style = {styles.img} alt="logo" src = {Logo}/>
+          <div style = {styles.switch}> 
+            <SwitchSelector
+              onChange = {(val) => {this.setState({choice: val})}} 
+              options = {[
+                {label: "Artist 🎙", value: "1", selectedBackgroundColor: "#26ae5f",},
+                {label: "Audience 🎧", value: "2", selectedBackgroundColor: "#26ae5f"}
+              ]}
+              wrapperBorderRadius = {50} 
+              optionBorderRadius = {50}
+              fontSize = {"20"} 
+              fontColor={COLORS.white}
+              backgroundColor={COLORS.black} />
           </div>
-          )
+          <button style = {styles.button} onClick = {this.registerUser}> Register </button>
+        </div>
+      );
+    }
+
+    else if (this.state.type === "1"){
+      return (
+        <Artist
+          account = {this.state.account}
+          ipfs = {this.state.ipfs}
+        />
+      )
     }
 
     else if (this.state.type === "2"){
       return (
-        <div style = {styles.body}>
-          <div style = {styles.main}>
-            <h2> Audience </h2>
-          </div>
-        </div>
+        <Audience
+          account = {this.state.account}
+          ipfs = {this.state.ipfs}
+        />
       )
     }
 
     else {
       return (
-        <div style = {styles.body}>
-          <div style = {styles.main}>
-            <img style = {styles.img} alt="logo" src = {Logo}/>
-            <div style = {styles.switch}> 
-              <SwitchSelector
-                onChange = {(val) => {this.setState({choice: val})}} 
-                options = {[
-                  {label: "Artist 🎙", value: "1", selectedBackgroundColor: "#26ae5f",},
-                  {label: "Audience 🎧", value: "2", selectedBackgroundColor: "#26ae5f"}
-                ]}
-                wrapperBorderRadius = {50} 
-                optionBorderRadius = {50}
-                fontSize = {"20"} 
-                fontColor={"rgb(240,240,230)"}
-                backgroundColor={"rgb(4,16,13)"} />
-            </div>
-            <button style = {styles.button} onClick = {this.RegisterUser}> Register </button>
-          </div>
+        <div style = {styles.main}>
+          <Loader type = "Bars" color = {COLORS.black}/>
         </div>
-      );
+      )
     }
   }
 }
 
 const styles = {
-  body : {
-    background:"rgb(240,240,230)"
-  },
   main : {
     display:"flex", 
     flexDirection:"column", 
     justifyContent: "center", 
     alignItems: "center", 
-    height:"100vh"
+    height:"100vh",
+    background:COLORS.brown
   },
   button : {
-    background:"rgb(4,16,13)", 
+    background:COLORS.black, 
     height: "50px",
     width : "15%", 
     fontSize: "1.2rem", 
     fontWeight: "500",
-    color: "rgb(240,240,230)",
+    color: COLORS.white,
     borderRadius:"50px", 
     border:"0px", 
     cursor:"pointer", 
     marginTop: 100, 
-    boxShadow: "2px 5px 2px #9E9E9E",
+    boxShadow: "2px 5px 2px #999",
   },
   img : {
     borderRadius:"100px", 
@@ -156,7 +135,6 @@ const styles = {
     height: "7.5%", 
     fontSize: "1.2rem", 
     fontWeight: "500", 
-    fontColor:"rgb(240,240,230)", 
     marginTop: 100}
 }
 
