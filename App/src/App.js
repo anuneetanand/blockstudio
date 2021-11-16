@@ -1,5 +1,5 @@
 import React from 'react'
-import Login from './Pages/Login.js'
+import Login from './Components/Login.js'
 
 
 class App extends React.Component {

@@ -3,7 +3,7 @@ import Web3 from 'web3'
 import Logo from "../Assets/logo.png"
 import SwitchSelector from "react-switch-selector"
 import contract from 'truffle-contract'
-import contractMeta from "../build/contracts/blockstudio.json"
+import contractMeta from "../Build/blockstudio.json"
 import {create} from 'ipfs-http-client'
 const ipfs = create({ host: 'ipfs.infura.io', port: '5001', protocol: 'https' })
 
