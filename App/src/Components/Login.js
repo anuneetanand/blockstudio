@@ -10,7 +10,6 @@ import contract from 'truffle-contract'
 import {create} from 'ipfs-http-client'
 import Loader from "react-loader-spinner"
 import SwitchSelector from "react-switch-selector"
-
 class Login extends React.Component {
 
   constructor(props){
