@@ -1,7 +1,7 @@
 import React from "react"
-import {COLORS} from "./Colors"
 import Artist from "./Artist"
 import Audience from "./Audience"
+import {COLORS} from "./Colors"
 import Logo from "../Assets/logo.png"
 import contractMeta from "../Build/blockstudio.json"
 
@@ -105,36 +105,35 @@ class Login extends React.Component {
 
 const styles = {
   main : {
+    height:"100vh",
     display:"flex", 
     flexDirection:"column", 
-    justifyContent: "center", 
+    justifyContent: "space-around", 
     alignItems: "center", 
-    height:"100vh",
     background:COLORS.brown
   },
-  button : {
-    background:COLORS.black, 
-    height: "50px",
+  button : { 
+    height: "7.5%",
     width : "15%", 
     fontSize: "1.2rem", 
-    fontWeight: "500",
-    color: COLORS.white,
-    borderRadius:"50px", 
-    border:"0px", 
+    fontWeight: "500",  
     cursor:"pointer", 
-    marginTop: 100, 
+    borderRadius:"50px",
     boxShadow: "2px 5px 2px #999",
+    color: COLORS.white,
+    background:COLORS.black,
   },
   img : {
+    width:"35%",
     borderRadius:"100px", 
-    width:"30%"
+    boxShadow: "2px 5px 2px #999",
   },
   switch: {
-    width: "25%", 
-    height: "7.5%", 
+    height: "7.5%",
+    width: "30%",  
     fontSize: "1.2rem", 
     fontWeight: "500", 
-    marginTop: 100}
+  }
 }
 
 export default Login;

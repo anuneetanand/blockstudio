@@ -7,15 +7,17 @@ class SongCard extends React.Component {
 
     constructor(props){
         super(props)
-        this.state = {playing : false}
+        this.state = {playing : false, hash : ""}
       }
 
     buySong = async () =>{
-        
+        // blockchain
     }
     
     playSong = async () =>{
         this.setState({playing : true})
+        // blockchain
+        // ipfs
     }
 
     pauseSong = async () =>{
@@ -60,17 +62,17 @@ const styles = {
     card : {
         height :"20%",
         width :"100%",
-        padding :"10px",
+        padding :"2%",
         display:"flex", 
         flexDirection:"row", 
         justifyContent: "space-between",
         alignItems: "center",
         borderRadius:"10px",
         border: "2px solid",
+        boxShadow: "1px 3px 1px #191919",
         borderColor :COLORS.black,
         backgroundColor:COLORS.brown,
-        boxShadow: "1px 3px 1px #191919",
     }
 }
   
-  export default SongCard;
+export default SongCard;
