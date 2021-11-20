@@ -11,8 +11,8 @@ class AddSongCard extends React.Component{
       }
     
       onSubmit = async values => {
-          // blockchain
-          // ipfs
+        // ipfs -> get hash  
+        // blockchain
       }
 
       componentDidMount(){

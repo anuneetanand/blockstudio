@@ -3,6 +3,7 @@ pragma solidity >=0.7.0 <0.9.0;
 contract blockstudio {
     uint256 audienceIDTracker;
     uint256 artistIDTracker;
+    uint256 songIDTracker;
 
     enum UserType {
         UNDEFINED,
@@ -12,27 +13,39 @@ contract blockstudio {
 
     struct Artist {
         string name;
-        uint256 ArtistID;
+        uint256 artistID;
         uint256 rating;
         uint256[] songsPublished;
     }
 
     struct Audience {
         string name;
-        uint256 AudienceID;
+        uint256 audienceID;
         uint256[] songsPurchased;
+    }
+
+    struct Song {
+        string songName;
+        string artistName;
+        string genre;
+        string hash;
+        uint256 songID;
+        uint256 price;
+        address payable artistAddress;
     }
 
     mapping(address => UserType) identifyUser;
     mapping(address => Artist) allArtists;
     mapping(address => Audience) allAudience;
+    mapping(uint256 => Song) allSongs;
 
     constructor() {
         audienceIDTracker = 0;
         artistIDTracker = 0;
+        songIDTracker = 0;
     }
 
-    function checkUser() external view returns (UserType) {
+    function checkUser() public view returns (UserType) {
         return identifyUser[msg.sender];
     }
 
@@ -41,7 +54,7 @@ contract blockstudio {
 
         Artist memory newArtist;
         newArtist.name = _name;
-        newArtist.ArtistID = artistIDTracker;
+        newArtist.artistID = artistIDTracker;
         newArtist.rating = 0;
 
         allArtists[msg.sender] = newArtist;
@@ -53,7 +66,7 @@ contract blockstudio {
 
         Audience memory newAudience;
         newAudience.name = _name;
-        newAudience.AudienceID = audienceIDTracker;
+        newAudience.audienceID = audienceIDTracker;
 
         allAudience[msg.sender] = newAudience;
         identifyUser[msg.sender] = UserType.AUDIENCE;
@@ -70,7 +83,7 @@ contract blockstudio {
     {
         return (
             allAudience[msg.sender].name,
-            allAudience[msg.sender].AudienceID,
+            allAudience[msg.sender].audienceID,
             allAudience[msg.sender].songsPurchased
         );
     }
@@ -87,11 +100,80 @@ contract blockstudio {
     {
         return (
             allArtists[msg.sender].name,
-            allArtists[msg.sender].ArtistID,
+            allArtists[msg.sender].artistID,
             allArtists[msg.sender].rating,
             allArtists[msg.sender].songsPublished
         );
     }
+
+    event songAdded(
+        uint256 songID,
+        string songName,
+        string artistName,
+        uint256 price
+    );
+
+    function addSong(
+        string memory _name,
+        string memory _genre,
+        string memory _hash,
+        uint256 _price
+    ) public {
+        require(identifyUser[msg.sender] == UserType.ARTIST);
+
+        songIDTracker += 1;
+
+        Song memory newSong;
+        newSong.songID = songIDTracker;
+        newSong.songName = _name;
+        newSong.artistName = allArtists[msg.sender].name;
+        newSong.genre = _genre;
+        newSong.hash = _hash;
+        newSong.price = _price;
+        newSong.artistAddress = payable(msg.sender);
+
+        allSongs[songIDTracker] = newSong;
+        allArtists[msg.sender].songsPublished.push(songIDTracker);
+
+        emit songAdded(
+            newSong.songID,
+            newSong.songName,
+            newSong.artistName,
+            newSong.price
+        );
+    }
+
+    event songPurchased(
+        uint256 songID,
+        string songName,
+        string audienceName,
+        uint256 price
+    );
+
+    function buySong(uint256 _songID) external payable {
+        require(identifyUser[msg.sender] == UserType.AUDIENCE);
+
+        Song memory curSong = allSongs[_songID];
+
+        require(msg.sender.balance > msg.value);
+
+        // (bool success, ) = curSong.artistAddress.call{value: msg.value}("");
+        // require(success, "Transfer failed.");
+        curSong.artistAddress.transfer(msg.value);
+
+        allAudience[msg.sender].songsPurchased.push(songIDTracker);
+
+        emit songPurchased(
+            curSong.songID,
+            curSong.songName,
+            allAudience[msg.sender].name,
+            curSong.price
+        );
+    }
+
+    // function getSongDetails() {
+
+    // }
 }
 
 // contract User {

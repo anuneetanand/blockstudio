@@ -14,7 +14,8 @@ class Login extends React.Component {
 
   constructor(props){
     super(props)
-    this.web3 = new Web3(Web3.givenProvider || "http://localhost:7545")
+    // this.web3 = new Web3(Web3.givenProvider || "http://localhost:7545")
+    this.web3 = new Web3("http://localhost:7545")
     this.contract = contract(contractMeta)
     this.contract.setProvider(this.web3.currentProvider)
     this.state = { account : "", type : "", choice : "1", ipfs : ""}
