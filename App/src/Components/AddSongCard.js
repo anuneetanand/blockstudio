@@ -7,7 +7,7 @@ import { faMusic, faFileUpload } from '@fortawesome/free-solid-svg-icons'
 
 class AddSongCard extends React.Component{
     constructor(props){
-        super(props)
+        super(props);
         this.state = {name : "", genre : "", cost: "", file : "" , buffer:"", hash : "", loading: false}
     }
     captureFile = (event)=>{

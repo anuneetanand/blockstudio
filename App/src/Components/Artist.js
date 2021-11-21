@@ -8,18 +8,18 @@ import { faMicrophone, faPlusSquare } from '@fortawesome/free-solid-svg-icons'
 class Artist extends React.Component {
 
     constructor(props){
-      super(props)
+      super(props);
       this.state = {form : false, name: "", artistId: "", rating: "", songIds: [], songs: []}
       this.openForm = this.openForm.bind(this)
       this.closeForm = this.closeForm.bind(this)
-      this.loadArtistDetails().then(() =>{ 
-          console.log("Loaded all artist Details")
-          this.loadSongDetails();
-        });
       
     }
   
     componentDidMount(){
+        this.loadArtistDetails().then(() =>{ 
+            console.log("Loaded all artist Details")
+            this.loadSongDetails();
+        });
     }
 
     async loadArtistDetails(){
