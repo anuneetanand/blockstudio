@@ -35,6 +35,7 @@ contract blockstudio {
     mapping (address => Artist) allArtists;
     mapping (address => Audience) allAudience;
     mapping (uint => Song) allSongs;
+    mapping (string => bool) songHashUsed;
     
     constructor() {
         audienceIDTracker = 0;
@@ -89,6 +90,7 @@ contract blockstudio {
     
     function addSong(string memory _name, string memory _genre, string memory _hash, uint _price) public {
         require(identifyUser[msg.sender] == UserType.ARTIST, "Not an artist.");
+        require(!songHashUsed[_hash], "Duplicate detected. Song hash already in use.");
         
         songIDTracker += 1;
         
@@ -103,6 +105,7 @@ contract blockstudio {
         
         allSongs[songIDTracker] = newSong;
         allArtists[msg.sender].songsPublished.push(songIDTracker);
+        songHashUsed[_hash] = true;
         
         emit songAdded(newSong.songID, newSong.songName, newSong.artistName, newSong.price);
     }
@@ -141,52 +144,3 @@ contract blockstudio {
     }
     
 }
-
-// contract User {
-//     address walletID;
-//     string public name;
-//     bool newUser;
-    
-//     // constructor() public (){
-        
-//     // }
-    
-//     // function buyToken() {
-        
-//     // }
-    
-    
-// }
-
-// contract Artist is User {
-//     uint ArtistID;
-//     uint public rating;
-//     uint[] songsPublished;
-    
-//     // function addSong() {
-        
-//     // }
-// }
-
-// contract Audience is User {
-//     uint AudienceID;
-//     uint[] songsPurchased;
-    
-//     // function buySong(uint SongID) {
-        
-//     // }
-    
-//     // function sponserArtist(uint ArtistID) {
-        
-//     // }
-// }
-
-// contract Song {
-//     uint public SongID;
-//     string public name;
-//     uint public ArtistID;
-//     string public genre;
-//     uint public releaseDate;
-//     uint cost;
-    
-// }
