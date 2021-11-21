@@ -14,12 +14,12 @@ class Login extends React.Component {
 
   constructor(props){
     super(props)
-    // this.web3 = new Web3(Web3.givenProvider || "http://localhost:7545")
-    this.web3 = new Web3("http://localhost:7545")
-    this.contract = contract(contractMeta)
-    this.contract.setProvider(this.web3.currentProvider)
-    this.state = { account : "", type : "", choice : "1", ipfs : ""}
-  }
+      window.web3 = new Web3(Web3.givenProvider || "http://localhost:7545")
+      // this.web3 = new Web3("http://localhost:7545")
+      window.contract = contract(contractMeta)
+      window.contract.setProvider(window.web3.currentProvider)
+      this.state = { account : "", type : "", choice : "1", ipfs : ""}
+    }
 
   componentDidMount(){
     this.loadBlockchain().then(() => console.log("Loaded Blockchain"))
@@ -28,7 +28,9 @@ class Login extends React.Component {
   }
 
   async loadBlockchain(){
-    const accounts = await this.web3.eth.getAccounts()
+    const accounts = await window.web3.eth.getAccounts()
+    console.log("yoyo"+Web3.givenProvider);
+    console.log(accounts);
     this.setState({account:accounts[0]})
   }
 
@@ -39,13 +41,13 @@ class Login extends React.Component {
 
   loginUser = async () => {
       let val = "0"
-      const contractInstance = await this.contract.deployed()
+      const contractInstance = await window.contract.deployed()
       await contractInstance.checkUser({from:this.state.account}).then((x)=>{ val = x.toString()})
       this.setState({type: val})
   }
 
   registerUser = async () =>{
-    const contractInstance = await this.contract.deployed()
+    const contractInstance = await window.contract.deployed()
     if (this.state.choice === "1")
       await contractInstance.addNewArtist("Artist",{from:this.state.account}).then(() => this.loginUser())
     if (this.state.choice === "2")
@@ -78,7 +80,7 @@ class Login extends React.Component {
 
     else if (this.state.type === "1"){
       return (
-        <Artist
+        <Artist 
           account = {this.state.account}
           ipfs = {this.state.ipfs}
         />
