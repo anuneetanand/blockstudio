@@ -1,6 +1,7 @@
 import React from "react"
 import {COLORS} from "./Colors"
 import Popup from 'reactjs-popup'
+import Loader from "react-loader-spinner"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMusic, faFileUpload } from '@fortawesome/free-solid-svg-icons'
 
@@ -50,12 +51,11 @@ class AddSongCard extends React.Component{
                 contentStyle={styles.contentStyle} 
                 overlayStyle = {styles.overlayStyle}>
                 { this.state.loading
-                ? <div><p>Loading...</p></div>
+                ? <div> <Loader type = "Bars" color = {COLORS.black}/></div>
                 : <form>
                     
                     <h2 style = {{textAlign:"center"}}> <FontAwesomeIcon icon={faMusic}/> Add Song </h2>
                     <div style = {styles.form} >
-                        <h6>hash: {this.state.hash}</h6>
                         <input type="text" style = {styles.textInput} 
                             placeholder ="Name"  
                             value={this.state.name} required
@@ -82,6 +82,14 @@ class AddSongCard extends React.Component{
 }
 
 const styles = {
+    main : {
+        height:"100vh",
+        display:"flex", 
+        flexDirection:"column", 
+        justifyContent: "space-around", 
+        alignItems: "center", 
+        background:COLORS.brown
+      },
     contentStyle : {
         height :"60%",
         width :"30%",

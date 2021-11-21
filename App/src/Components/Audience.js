@@ -9,10 +9,61 @@ class Audience extends React.Component {
 
     constructor(props){
       super(props)
-      this.state = {}
+      this.state = {songsCount: 0, songs: [], songsPurchasedMapping: {}}
     }
   
-    componentDidMount(){
+    async componentDidMount(){
+      const contractInstance = await window.contract.deployed();
+      let songsCount = await contractInstance.getNumSongs({from:this.props.account});
+      this.setState({songsCount : parseInt(songsCount.toString())})
+      await this.loadSongDetails();
+      await this.loadAudienceDetails();
+      console.log(this.state.songsPurchasedMapping);
+    }
+
+    async loadAudienceDetails(){
+      const contractInstance = await window.contract.deployed();
+      const audienceDetails = await contractInstance.getAudienceDetails({from:this.props.account});
+      this.state.name = audienceDetails[0].toString();
+      this.state.audienceID = audienceDetails[1].toString();
+      for(let i=0;i<audienceDetails[2].length;i++){
+          this.state.songsPurchasedMapping[parseInt(audienceDetails[2][i].toString())] = 1;
+      }
+
+  }
+
+    async loadSongDetails(){
+      const contractInstance = await window.contract.deployed();
+
+      for(let i=1;i<this.state.songsCount+1;i++){
+          let songDetails = await contractInstance.getSongDetails(i, {from:this.props.account});
+          this.state.songs.push({'name': songDetails[0],
+          'genre': songDetails[2],
+          'hash': songDetails[3],
+          'price': songDetails[4].toString(),
+          });
+          this.state.songsPurchasedMapping[i] = 0;
+      }
+
+      console.log(this.state.songs);
+
+    }
+
+    async loadPurchasedSongsInfo(){
+      const contractInstance = await window.contract.deployed();
+
+
+      for(let i=1;i<this.state.songsCount+1;i++){
+          let songDetails = await contractInstance.getSongDetails(i, {from:this.props.account});
+          this.state.songs.push({'name': songDetails[0],
+          'genre': songDetails[2],
+          'hash': songDetails[3],
+          'price': songDetails[4].toString(),
+          });
+      }
+
+      console.log(this.state.songs);
+
     }
 
     render(){
@@ -21,9 +72,14 @@ class Audience extends React.Component {
                 <FontAwesomeIcon icon={faHeadphones} size="3x" />
                 <h1> Audience </h1>
                 <div style = {styles.box}>
-                    <SongCard type = "audience" name = "Blinding Lights" artistName = "The Weeknd" genre ="Pop"/>
-                    <SongCard name = "Blinding Lights" genre ="Pop" cost = "50"/>
-                    {/* <ReactAudioPlayer style = {{width:"100%"}} src={MySong} controls controlsList="nodownload noplaybackrate"/> */}
+                    {this.state.songs.map((item,i)=> (
+                        <SongCard 
+                        type = {"audience"}
+                        name = {item['name']}
+                        genre = {item['genre']}
+                        cost = {item['price']}
+                        hash = {item['hash']}
+                        key = {i}/>))}
                 </div>
             </div>
         )

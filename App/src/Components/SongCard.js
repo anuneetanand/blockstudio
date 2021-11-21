@@ -8,7 +8,11 @@ class SongCard extends React.Component {
     constructor(props){
         super(props)
         this.state = {playing : false, hash : ""}
-      }
+    }
+
+    componentDidMount(){
+        console.log("yo"+this.props.genre);
+    }
 
     buySong = async () =>{
         // blockchain

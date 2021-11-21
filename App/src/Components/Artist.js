@@ -70,8 +70,16 @@ class Artist extends React.Component {
                 <h1><FontAwesomeIcon icon={faMicrophone}/></h1>
                 <h1> Artist </h1>
                 <div style = {styles.box}>
-                    <SongCard type = "artist" name = "Blinding Lights" genre = "Pop" cost = "50" likes = "25"/>
-                    <SongCard type = "artist" name = "Starboy" genre = "Pop" cost = "100" likes = "25"/>
+                    {
+                    this.state.songs.map((item,i)=> (
+                    <SongCard 
+                        type = {"artist"}
+                        name = {item.name}
+                        genre = {item.genre}
+                        cost = {item.price}
+                        likes = {"0"}
+                        hash = {item.hash}
+                        key = {i}/>))}
                 </div>
                 <h1><FontAwesomeIcon  icon={faPlusSquare} onClick = {()=>{this.openForm()}}/></h1>
                 <AddSongCard ipfs = {this.props.ipfs} account = {this.props.account} form = {this.state.form} closeForm = {this.closeForm}/>
