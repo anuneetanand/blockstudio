@@ -2,6 +2,7 @@ import React from "react"
 import {COLORS} from "./Colors"
 import SongCard from "./SongCard"
 import AddSongCard from "./AddSongCard"
+import Loader from "react-loader-spinner"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMicrophone, faPlusSquare } from '@fortawesome/free-solid-svg-icons'
 
@@ -9,51 +10,42 @@ class Artist extends React.Component {
 
     constructor(props){
       super(props);
-      this.state = {form : false, name: "", artistId: "", rating: "", songIds: [], songs: []}
+      this.state = {form : false, name: "", artistID: "", rating: "", songIDs: [], songs: []}
       this.openForm = this.openForm.bind(this)
       this.closeForm = this.closeForm.bind(this)
-      
     }
   
     componentDidMount(){
         this.loadArtistDetails().then(() =>{ 
-            console.log("Loaded all artist Details")
-            this.loadSongDetails();
+            console.log("Loaded Artist Details")
+            this.loadSongDetails().then(() =>{ 
+                console.log("Loaded Artist Songs")})
         });
     }
 
     async loadArtistDetails(){
-        const contractInstance = await window.contract.deployed();
-        const artistDetails = await contractInstance.getArtistDetails({from:this.props.account});
-        this.state.name = artistDetails[0].toString();
-        this.state.artistID = artistDetails[1].toString();
-        this.state.rating = artistDetails[2].toString();
-
-        for(let i=0;i<artistDetails[3].length;i++){
-            this.state.songIds.push(artistDetails[3][i].toString());
+        const contractInstance = await this.props.contract.deployed()
+        const artistDetails = await contractInstance.getArtistDetails({from:this.props.account})
+        let songList = []
+        for (let i = 0; i < artistDetails[3].length; i++){
+            songList.push(artistDetails[3][i].toString())
         }
-
+        this.setState({
+            name:artistDetails[0].toString(),
+            artistID:artistDetails[1].toString(),
+            rating:artistDetails[2].toString(),
+            songIDs:songList
+        })   
     }
 
     async loadSongDetails(){
-        const contractInstance = await window.contract.deployed();
-
-        for(let i=0;i<this.state.songIds.length;i++){
-            let songDetails = await contractInstance.getSongDetails(this.state.songIds[i], {from:this.props.account});
-            console.log({'name': songDetails[0],
-            'genre': songDetails[2],
-            'hash': songDetails[3],
-            'price': songDetails[4].toString(),
-            });
-            this.state.songs.push({'name': songDetails[0],
-            'genre': songDetails[2],
-            'hash': songDetails[3],
-            'price': songDetails[4].toString(),
-            });
+        const contractInstance = await this.props.contract.deployed();
+        let songInfoList = []
+        for(let i = 0; i < this.state.songIDs.length; i++){
+            let songDetails = await contractInstance.getSongDetails(this.state.songIDs[i], {from:this.props.account});
+            songInfoList.push({'name': songDetails[0],'genre': songDetails[2],'hash': songDetails[3],'cost': songDetails[4].toString()});
         }
-
-        console.log(this.state.songs);
-
+        this.setState({songs:songInfoList})
     }
 
     openForm(){
@@ -65,26 +57,39 @@ class Artist extends React.Component {
     }
 
     render(){
-        return (
-            <div style = {styles.main}>
-                <h1><FontAwesomeIcon icon={faMicrophone}/></h1>
-                <h1> Artist </h1>
-                <div style = {styles.box}>
-                    {
-                    this.state.songs.map((item,i)=> (
-                    <SongCard 
-                        type = {"artist"}
-                        name = {item.name}
-                        genre = {item.genre}
-                        cost = {item.price}
-                        likes = {"0"}
-                        hash = {item.hash}
-                        key = {i}/>))}
+        
+        if (this.state.artistID === ""){
+            return (
+                <div style = {styles.main}>
+                  <Loader type = "Bars" color = {COLORS.black}/>
                 </div>
-                <h1><FontAwesomeIcon  icon={faPlusSquare} onClick = {()=>{this.openForm()}}/></h1>
-                <AddSongCard ipfs = {this.props.ipfs} account = {this.props.account} form = {this.state.form} closeForm = {this.closeForm}/>
-            </div>
-        )
+            )
+        }
+
+        else{
+            return (
+                <div style = {styles.main}>
+                    <h2><FontAwesomeIcon icon={faMicrophone}/> </h2>
+                    <h2> {this.state.name} </h2>
+                    <h2> ID : {this.state.artistID} </h2>
+                    <h2> Rating : {this.state.rating} </h2>
+                    <div style = {styles.box}>
+                        {this.state.songs.map((item,i)=> (
+                        <SongCard 
+                            type = {"artist"}
+                            name = {item.name}
+                            genre = {item.genre}
+                            cost = {item.price}
+                            likes = {"0"}
+                            hash = {item.hash}
+                            key = {i}
+                        />))}
+                    </div>
+                    <h1><FontAwesomeIcon  icon={faPlusSquare} onClick = {()=>{this.openForm()}}/></h1>
+                    <AddSongCard contract = {this.props.contract} ipfs = {this.props.ipfs} account = {this.props.account} form = {this.state.form} closeForm = {this.closeForm}/>
+                </div>
+            )
+        }
     }
 }
   

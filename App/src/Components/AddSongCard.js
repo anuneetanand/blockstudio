@@ -9,34 +9,32 @@ import { faMusic, faFileUpload } from '@fortawesome/free-solid-svg-icons'
 class AddSongCard extends React.Component{
     constructor(props){
         super(props);
-        this.state = {name : "", genre : "", cost: "", file : "" , buffer:"", hash : "", loading: false}
+        this.state = {name : "", genre : "", cost: "", buffer: "", hash : "", loading: false}
     }
+    
     captureFile = (event)=>{
-        event.preventDefault();
+        event.preventDefault()
         const file = event.target.files[0]
-        const file_reader = new window.FileReader()
+        const file_reader = new FileReader()
         file_reader.readAsArrayBuffer(file)
         file_reader.onloadend = () =>{
             this.setState({buffer: Buffer.from(file_reader.result)})
         }
     }
+
     onSubmitClick = async (event)=>{
-        // ipfs -> get hash  
-        // blockchain
         event.preventDefault()
         if(this.state.buffer){
             this.setState({ loading: true })
             const file = await this.props.ipfs.add(this.state.buffer);
             const imageHash = file["path"];
             this.setState({hash: imageHash});
-            const contractInstance = await window.contract.deployed()
+            const contractInstance = await this.props.contract.deployed()
             await contractInstance.addSong(this.state.name, this.state.genre, this.state.hash, this.state.cost, {from:this.props.account});
-
             this.setState({ loading: false })
             console.log(file);
         }
     }  
-
 
     componentDidMount(){
       
@@ -51,7 +49,7 @@ class AddSongCard extends React.Component{
                 contentStyle={styles.contentStyle} 
                 overlayStyle = {styles.overlayStyle}>
                 { this.state.loading
-                ? <div> <Loader type = "Bars" color = {COLORS.black}/></div>
+                ? <div style = {styles.load}> <Loader type = "Bars" color = {COLORS.black}/></div>
                 : <form>
                     
                     <h2 style = {{textAlign:"center"}}> <FontAwesomeIcon icon={faMusic}/> Add Song </h2>
@@ -82,8 +80,8 @@ class AddSongCard extends React.Component{
 }
 
 const styles = {
-    main : {
-        height:"100vh",
+    load : {
+        height:"100%",
         display:"flex", 
         flexDirection:"column", 
         justifyContent: "space-around", 

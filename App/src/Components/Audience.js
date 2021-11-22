@@ -1,89 +1,121 @@
 import React from "react"
 import {COLORS} from "./Colors"
 import SongCard from "./SongCard"
-// import MySong from "../Assets/sample.mp3"
-// import ReactAudioPlayer from 'react-audio-player'
+import Loader from "react-loader-spinner"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeadphones } from '@fortawesome/free-solid-svg-icons'
 class Audience extends React.Component {
 
     constructor(props){
       super(props)
-      this.state = {songsCount: 0, songs: [], songsPurchasedMapping: {}}
+      this.state = {name : "", audienceID: "", allSongsCount: 0, toBuy : [], songs: [], songsPurchasedMapping: {}}
     }
   
-    async componentDidMount(){
-      const contractInstance = await window.contract.deployed();
-      let songsCount = await contractInstance.getNumSongs({from:this.props.account});
-      this.setState({songsCount : parseInt(songsCount.toString())})
-      await this.loadSongDetails();
-      await this.loadAudienceDetails();
-      console.log(this.state.songsPurchasedMapping);
+    componentDidMount(){
+      this.loadSongIDs().then(() => {
+        this.loadAudienceDetails().then(() => {
+          this.loadSongDetails().then(()=>{console.log("Loaded Songs")})
+        })
+      })
+    }
+
+    async loadSongIDs()
+    {
+      const contractInstance = await this.props.contract.deployed()
+      const count = await contractInstance.getNumSongs({from:this.props.account})
+      let mapping = {}
+      for(let i=1;i<parseInt(count.toString())+1;i++){
+        mapping[i] = 0;
+      }
+      this.setState({
+        allSongsCount : parseInt(count.toString()), 
+        songsPurchasedMapping:mapping
+      })
     }
 
     async loadAudienceDetails(){
-      const contractInstance = await window.contract.deployed();
-      const audienceDetails = await contractInstance.getAudienceDetails({from:this.props.account});
-      this.state.name = audienceDetails[0].toString();
-      this.state.audienceID = audienceDetails[1].toString();
+      const contractInstance = await this.props.contract.deployed()
+      const audienceDetails = await contractInstance.getAudienceDetails({from:this.props.account})
+      let purchasedSongs = this.state.songsPurchasedMapping
       for(let i=0;i<audienceDetails[2].length;i++){
-          this.state.songsPurchasedMapping[parseInt(audienceDetails[2][i].toString())] = 1;
+        purchasedSongs[parseInt(audienceDetails[2][i].toString())] = 1
       }
-
-  }
-
-    async loadSongDetails(){
-      const contractInstance = await window.contract.deployed();
-
-      for(let i=1;i<this.state.songsCount+1;i++){
-          let songDetails = await contractInstance.getSongDetails(i, {from:this.props.account});
-          this.state.songs.push({'name': songDetails[0],
-          'genre': songDetails[2],
-          'hash': songDetails[3],
-          'price': songDetails[4].toString(),
-          });
-          this.state.songsPurchasedMapping[i] = 0;
-      }
-
-      console.log(this.state.songs);
-
+      this.setState({
+        name:audienceDetails[0].toString(),
+        audienceID:audienceDetails[1].toString(),
+        songsPurchasedMapping:purchasedSongs
+      })
     }
 
-    async loadPurchasedSongsInfo(){
-      const contractInstance = await window.contract.deployed();
-
-
-      for(let i=1;i<this.state.songsCount+1;i++){
-          let songDetails = await contractInstance.getSongDetails(i, {from:this.props.account});
-          this.state.songs.push({'name': songDetails[0],
-          'genre': songDetails[2],
-          'hash': songDetails[3],
-          'price': songDetails[4].toString(),
+    async loadSongDetails(){
+      const contractInstance = await this.props.contract.deployed();
+      let purchasedSongs = []
+      let newSongs = []
+      for(let i=1;i<this.state.allSongsCount;i++){
+        let songDetails = await contractInstance.getSongDetails(i, {from:this.props.account})
+        if(this.state.songsPurchasedMapping[i]===1)
+        {
+          purchasedSongs.push({
+            'name': songDetails[0],
+            'genre': songDetails[2],
+            'hash': songDetails[3],
+            'cost': songDetails[4].toString(),
           });
-      }
-
-      console.log(this.state.songs);
-
+        }
+        else
+        {
+          newSongs.push({
+            'name': songDetails[0],
+            'genre': songDetails[2],
+            'hash': songDetails[3],
+            'cost': songDetails[4].toString(),
+          });
+        }
+      } 
+      this.setState({
+        songs:purchasedSongs,
+        toBuy : newSongs
+      })
     }
 
     render(){
+      if (this.state.ID === ""){
+          return (
+              <div style = {styles.main}>
+                <Loader type = "Bars" color = {COLORS.black}/>
+              </div>
+          )
+      }
+
+    else{
         return (
             <div style = {styles.main}>
-                <FontAwesomeIcon icon={faHeadphones} size="3x" />
-                <h1> Audience </h1>
+                <h2> <FontAwesomeIcon icon={faHeadphones} /></h2>
+                <h2> {this.state.name} </h2>
+                <h2> ID : {this.state.audienceID} </h2>
                 <div style = {styles.box}>
                     {this.state.songs.map((item,i)=> (
                         <SongCard 
                         type = {"audience"}
-                        name = {item['name']}
-                        genre = {item['genre']}
-                        cost = {item['price']}
-                        hash = {item['hash']}
+                        name = {item.name}
+                        genre = {item.genre}
+                        hash = {item.hash}
+                        key = {i}/>))}
+                </div>
+                <div style = {styles.box}>
+                    {this.state.toBuy.map((item,i)=> (
+                        <SongCard 
+                        type = {"shop"}
+                        name = {item.name}
+                        genre = {item.genre}
+                        cost = {item.cost}
+                        hash = {item.hash}
                         key = {i}/>))}
                 </div>
             </div>
         )
     }
+  }
 }
   
 const styles = {

@@ -11,7 +11,6 @@ class SongCard extends React.Component {
     }
 
     componentDidMount(){
-        console.log("yo"+this.props.genre);
     }
 
     buySong = async () =>{
