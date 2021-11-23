@@ -20,12 +20,15 @@ class SongCard extends React.Component {
     
     playSong = async () =>{
         this.setState({playing : true})
-        // blockchain
-        // ipfs
+        console.log(this.props.hash);
+        let audio_src= "https://ipfs.infura.io/ipfs/"+this.props.hash;
+        var audio = new Audio(audio_src);
+        audio.play();
     }
 
     pauseSong = async () =>{
         this.setState({playing : false})
+        this.state.audio.pause()
     }
 
     render(){
