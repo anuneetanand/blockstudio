@@ -14,7 +14,8 @@ class SongCard extends React.Component {
     }
 
     buySong = async () =>{
-        // blockchain
+        const contractInstance = await this.props.contract.deployed();
+        await contractInstance.buySong(this.props.songID, {from:this.props.account, value: this.props.cost});
     }
     
     playSong = async () =>{

@@ -45,6 +45,7 @@ class Artist extends React.Component {
             let songDetails = await contractInstance.getSongDetails(this.state.songIDs[i], {from:this.props.account});
             songInfoList.push({'name': songDetails[0],'genre': songDetails[2],'hash': songDetails[3],'cost': songDetails[4].toString()});
         }
+        console.log(songInfoList);
         this.setState({songs:songInfoList})
     }
 

@@ -51,7 +51,7 @@ class Audience extends React.Component {
       const contractInstance = await this.props.contract.deployed();
       let purchasedSongs = []
       let newSongs = []
-      for(let i=1;i<this.state.allSongsCount;i++){
+      for(let i=1;i<this.state.allSongsCount+1;i++){
         let songDetails = await contractInstance.getSongDetails(i, {from:this.props.account})
         if(this.state.songsPurchasedMapping[i]===1)
         {
@@ -60,6 +60,7 @@ class Audience extends React.Component {
             'genre': songDetails[2],
             'hash': songDetails[3],
             'cost': songDetails[4].toString(),
+            'songID': i
           });
         }
         else
@@ -69,9 +70,12 @@ class Audience extends React.Component {
             'genre': songDetails[2],
             'hash': songDetails[3],
             'cost': songDetails[4].toString(),
+            'songID': i
           });
         }
       } 
+      console.log(purchasedSongs);
+      console.log(newSongs);
       this.setState({
         songs:purchasedSongs,
         toBuy : newSongs
@@ -100,16 +104,19 @@ class Audience extends React.Component {
                         name = {item.name}
                         genre = {item.genre}
                         hash = {item.hash}
+                        songID = {item.songID}
                         key = {i}/>))}
                 </div>
                 <div style = {styles.box}>
                     {this.state.toBuy.map((item,i)=> (
                         <SongCard 
+                        contract = {this.props.contract} ipfs = {this.props.ipfs} account = {this.props.account}
                         type = {"shop"}
                         name = {item.name}
                         genre = {item.genre}
                         cost = {item.cost}
                         hash = {item.hash}
+                        songID = {item.songID}
                         key = {i}/>))}
                 </div>
             </div>
