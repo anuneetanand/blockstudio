@@ -10,17 +10,15 @@ class Artist extends React.Component {
 
     constructor(props){
       super(props);
-      this.state = {form : false, name: "", artistID: "", rating: "", songIDs: [], songs: []}
+      this.state = {name: "", artistID: "", rating: "", songIDs: [], songs: [], form : false}
       this.openForm = this.openForm.bind(this)
       this.closeForm = this.closeForm.bind(this)
     }
   
     componentDidMount(){
-        this.loadArtistDetails().then(() =>{ 
-            console.log("Loaded Artist Details")
-            this.loadSongDetails().then(() =>{ 
-                console.log("Loaded Artist Songs")})
-        });
+        this.loadArtistDetails().then(() =>{ console.log("Loaded Artist's Details")
+            this.loadSongDetails().then(() =>{ console.log("Loaded Artist's Songs")})
+        })
     }
 
     async loadArtistDetails(){
@@ -43,9 +41,13 @@ class Artist extends React.Component {
         let songInfoList = []
         for(let i = 0; i < this.state.songIDs.length; i++){
             let songDetails = await contractInstance.getSongDetails(this.state.songIDs[i], {from:this.props.account});
-            songInfoList.push({'name': songDetails[0],'genre': songDetails[2],'hash': songDetails[3],'cost': songDetails[4].toString()});
+            songInfoList.push({
+                'name': songDetails[0],
+                'genre': songDetails[2],
+                'hash': songDetails[3],
+                'cost': songDetails[4].toString()
+            });
         }
-        console.log(songInfoList);
         this.setState({songs:songInfoList})
     }
 
@@ -70,17 +72,18 @@ class Artist extends React.Component {
         else{
             return (
                 <div style = {styles.main}>
-                    <h2><FontAwesomeIcon icon={faMicrophone}/> </h2>
-                    <h2> {this.state.name} </h2>
-                    <h2> ID : {this.state.artistID} </h2>
-                    <h2> Rating : {this.state.rating} </h2>
+                    <div style = {styles.info}>
+                        <h1><FontAwesomeIcon icon={faMicrophone}/> {this.state.name}  </h1>
+                        <h3> Artist ID : {this.state.artistID} </h3>
+                        <h3> Rating : {this.state.rating} </h3>
+                    </div>
                     <div style = {styles.box}>
                         {this.state.songs.map((item,i)=> (
                         <SongCard 
                             type = {"artist"}
                             name = {item.name}
                             genre = {item.genre}
-                            cost = {item.price}
+                            cost = {item.cost}
                             likes = {"0"}
                             hash = {item.hash}
                             key = {i}
@@ -103,6 +106,11 @@ const styles = {
         height:"100vh",
         gap :"5%",
         background:COLORS.brown,
+        },
+    info : {
+        display:"flex", 
+        flexDirection:"column", 
+        alignItems: "center", 
         },
     box : {
         height :"50%",

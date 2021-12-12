@@ -7,28 +7,37 @@ class SongCard extends React.Component {
 
     constructor(props){
         super(props)
-        this.state = {playing : false, hash : ""}
+        this.state = {playing : false, audio: "", hash : ""}
     }
 
     componentDidMount(){
+        this.loadSong()
     }
 
     buySong = async () =>{
         const contractInstance = await this.props.contract.deployed();
-        await contractInstance.buySong(this.props.songID, {from:this.props.account, value: this.props.cost});
+        await contractInstance.buySong(this.props.songID, {from:this.props.account, value: this.props.cost})
     }
     
-    playSong = async () =>{
-        this.setState({playing : true})
-        console.log(this.props.hash);
+    loadSong = async () =>{
         let audio_src= "https://ipfs.infura.io/ipfs/"+this.props.hash;
-        var audio = new Audio(audio_src);
-        audio.play();
+        this.setState({ audio: new Audio(audio_src)})
+    }
+
+    playSong = async () =>{
+        console.log(this.state.audio)
+        if(this.state.audio){
+            this.setState({playing : true})
+            this.state.audio.play()
+        }
     }
 
     pauseSong = async () =>{
-        this.setState({playing : false})
-        this.state.audio.pause()
+        console.log(this.state.audio)
+        if(this.state.audio){
+            this.setState({playing : false})
+            this.state.audio.pause()
+        }
     }
 
     render(){
@@ -43,10 +52,10 @@ class SongCard extends React.Component {
             )
         else if (this.props.type === "audience")
             return (
-                <div style = {styles.card}>
+                <div style = {!this.state.playing? styles.card : styles.cardHiglight}>
                     <h3> <FontAwesomeIcon icon={faCompactDisc}  spin = {this.state.playing}/> {this.props.name} </h3>
                     <h3> <FontAwesomeIcon icon={faTag} /> {this.props.genre} </h3>
-                    <h3> <FontAwesomeIcon icon={faMicrophone} /> {this.props.artistName} </h3>
+                    <h3> <FontAwesomeIcon icon={faMicrophone} /> {this.props.artist} </h3>
                     {   this.state.playing? 
                             <h3> <FontAwesomeIcon onClick={this.pauseSong} icon={faPause} /> </h3> 
                         :   <h3> <FontAwesomeIcon onClick={this.playSong} icon={faPlay} /> </h3>
@@ -58,6 +67,7 @@ class SongCard extends React.Component {
                 <div style = {styles.card}>
                     <h3> <FontAwesomeIcon icon={faCompactDisc} /> {this.props.name} </h3>
                     <h3> <FontAwesomeIcon icon={faTag} /> {this.props.genre} </h3>
+                    <h3> <FontAwesomeIcon icon={faMicrophone} /> {this.props.artist} </h3>
                     <h3> <FontAwesomeIcon icon={faCoins} /> {this.props.cost} </h3>
                     <h3> <FontAwesomeIcon onClick={this.buySong} icon={faShoppingCart} /> </h3>
                 </div>
@@ -79,7 +89,21 @@ const styles = {
         boxShadow: "1px 3px 1px #191919",
         borderColor :COLORS.black,
         backgroundColor:COLORS.brown,
-    }
+    },
+    cardHiglight : {
+        height :"20%",
+        width :"100%",
+        padding :"2%",
+        display:"flex", 
+        flexDirection:"row", 
+        justifyContent: "space-between",
+        alignItems: "center",
+        borderRadius:"10px",
+        border: "2px solid",
+        boxShadow: "1px 3px 1px #191919",
+        borderColor :COLORS.black,
+        backgroundColor:COLORS.highlight,
+    },
 }
   
 export default SongCard;

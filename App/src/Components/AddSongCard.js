@@ -5,7 +5,6 @@ import Loader from "react-loader-spinner"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMusic, faFileUpload } from '@fortawesome/free-solid-svg-icons'
 
-
 class AddSongCard extends React.Component{
     constructor(props){
         super(props);
@@ -27,18 +26,16 @@ class AddSongCard extends React.Component{
         if(this.state.buffer){
             this.setState({ loading: true })
             const file = await this.props.ipfs.add(this.state.buffer);
-            const imageHash = file["path"];
-            this.setState({hash: imageHash});
+            const songHash = file["path"];
+            this.setState({hash: songHash});
             const contractInstance = await this.props.contract.deployed()
-            await contractInstance.addSong(this.state.name, this.state.genre, this.state.hash, this.state.cost, {from:this.props.account});
-            this.setState({ loading: false })
-            console.log(file);
+            await contractInstance.addSong(this.state.name, this.state.genre, this.state.hash, this.state.cost, {from:this.props.account}).then(()=>{
+                this.setState({ loading: false })
+                this.props.closeForm()
+                window.location.reload()
+            })
         }
     }  
-
-    componentDidMount(){
-      
-    }
   
     render() {
         return(
@@ -51,7 +48,6 @@ class AddSongCard extends React.Component{
                 { this.state.loading
                 ? <div style = {styles.load}> <Loader type = "Bars" color = {COLORS.black}/></div>
                 : <form>
-                    
                     <h2 style = {{textAlign:"center"}}> <FontAwesomeIcon icon={faMusic}/> Add Song </h2>
                     <div style = {styles.form} >
                         <input type="text" style = {styles.textInput} 
@@ -137,5 +133,4 @@ const styles = {
       },
   }
   
-
 export default AddSongCard;

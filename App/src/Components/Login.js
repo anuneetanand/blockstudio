@@ -17,7 +17,7 @@ class Login extends React.Component {
       this.web3 = new Web3(Web3.givenProvider || "http://localhost:7545")
       this.contract = contract(contractMeta)
       this.contract.setProvider(this.web3.currentProvider)
-      this.state = { account : "", type : "", choice : "1", ipfs : ""}
+      this.state = { account : "", ipfs : "", username: "", type : "", choice : "1", }
     }
 
   componentDidMount(){
@@ -46,9 +46,9 @@ class Login extends React.Component {
   registerUser = async () =>{
     const contractInstance = await this.contract.deployed()
     if (this.state.choice === "1")
-      await contractInstance.addNewArtist("Artist",{from:this.state.account}).then(() => this.loginUser())
+      await contractInstance.addNewArtist(this.state.username,{from:this.state.account}).then(() => this.loginUser())
     if (this.state.choice === "2")
-      await contractInstance.addNewAudience("Audience",{from:this.state.account}).then(() => this.loginUser())
+      await contractInstance.addNewAudience(this.state.username,{from:this.state.account}).then(() => this.loginUser())
   }
 
   render(){
@@ -69,6 +69,11 @@ class Login extends React.Component {
               fontSize = {"20"} 
               fontColor={COLORS.white}
               backgroundColor={COLORS.black} />
+          </div>
+          <div style={styles.username}>
+            <input  type="text" placeholder ="Username"  style = {styles.textInput} 
+                  value={this.state.username} required
+                  onChange={(x)=>{this.setState({username:x.target.value})}} />
           </div>
           <button style = {styles.button} onClick = {this.registerUser}> Register </button>
         </div>
@@ -126,16 +131,41 @@ const styles = {
     background:COLORS.black,
   },
   img : {
-    width:"35%",
+    width:"32.5%",
     borderRadius:"100px", 
     boxShadow: "2px 5px 2px #999",
   },
   switch: {
     height: "7.5%",
-    width: "30%",  
+    width: "25%",  
     fontSize: "1.2rem", 
     fontWeight: "500", 
-  }
+  },
+  form:{
+    marginBottom :"5%",
+    marginTop :"5%",
+    padding :"5%",
+    display:"flex", 
+    flexDirection:"column",
+    alignItems: "center", 
+    borderRadius:"10px",
+    border: "2px solid",
+    overflow: "auto",
+    gap : "20px",
+    borderColor :COLORS.black,
+    backgroundColor:COLORS.brown,
+  },
+  username:{
+    height: "6%",
+    width : "15%", 
+    fontSize: "1.2rem",  
+  },
+  textInput : {
+    height: "100%",
+    borderRadius:"15px",
+    padding: "3%",
+    textAlign: "center",
+   },
 }
 
 export default Login;
