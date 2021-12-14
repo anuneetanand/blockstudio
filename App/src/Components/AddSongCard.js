@@ -132,7 +132,7 @@ const styles = {
         cursor:"pointer",
         background:COLORS.black, 
         color: COLORS.white,
-      },
+    },
   }
   
 export default AddSongCard;

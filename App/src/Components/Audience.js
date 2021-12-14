@@ -3,12 +3,12 @@ import {COLORS} from "./Colors"
 import SongCard from "./SongCard"
 import Loader from "react-loader-spinner"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHeadphones, faStore, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faHeadphones, faStore, faUser, faGift } from '@fortawesome/free-solid-svg-icons'
 class Audience extends React.Component {
 
     constructor(props){
       super(props)
-      this.state = {name : "", audienceID: "", store : [], library: [], songsMapping: {}}
+      this.state = {name : "", audienceID: "", store : [], library: [], songsMapping: {}, supportArtistUsername:"", donation:""}
     }
   
     componentDidMount(){
@@ -80,6 +80,17 @@ class Audience extends React.Component {
       })
     }
 
+    onSubmitClick = async (event)=>{
+      event.preventDefault()
+      if(this.state.artistUsername){
+          const contractInstance = await this.props.contract.deployed()
+          await contractInstance.donateArtist(this.state.supportArtistUsername, this.web3.utils.toWei(this.state.donation, 'milliether'), {from:this.props.account}).then(()=>{
+              window.location.reload()
+          })
+      }
+    } 
+
+
     render(){
       if (this.state.ID === ""){
           return (
@@ -124,6 +135,20 @@ class Audience extends React.Component {
                           key = {i}/>))}
                   </div>
                 </div>
+                <div>
+                  <form>
+                    <div style = {styles.form}>
+                      <h3 style = {{textAlign:"center"}}> <FontAwesomeIcon icon={faGift}/> Sponsor Artist</h3>
+                      <input  type="text" placeholder ="Artist Username"  style = {styles.textInput} 
+                          value={this.state.supportArtistUsername} required
+                          onChange={(x)=>{this.setState({supportArtistUsername:x.target.value})}} />
+                      <input  type="text" placeholder ="Amount"  style = {styles.textInput} 
+                          value={this.state.donation} required
+                          onChange={(x)=>{this.setState({donation:x.target.value})}} />      
+                      <input type="submit"  onClick={this.onSubmitClick} style = {styles.button} value="Donate" />
+                    </div>
+                  </form>
+                </div>
             </div>
         )
     }
@@ -132,9 +157,10 @@ class Audience extends React.Component {
   
 const styles = {
   main : {
+    padding : "3%",
     display:"flex", 
     flexDirection:"column", 
-    justifyContent: "center", 
+    justifyContent: "centre", 
     alignItems: "center", 
     height:"100vh",
     gap :"5%",
@@ -146,7 +172,7 @@ const styles = {
     alignItems: "center", 
     },
   library : {
-    height :"75%",
+    height :"100%",
     width :"40%",
     padding :"25px",
     display:"flex", 
@@ -160,7 +186,7 @@ const styles = {
     backgroundColor:COLORS.white,
   },
   store : {
-    height :"75%",
+    height :"100%",
     width :"60%",
     padding :"25px",
     display:"flex", 
@@ -174,12 +200,36 @@ const styles = {
     backgroundColor: COLORS.white,
   },
   area : {
-    height :"75%",
+    height :"100%",
     width :"90%",
     display:"flex", 
     flexDirection:"row",
     gap : "5%"
-  }
+  },
+  form:{
+    padding :"2%",
+    display:"flex", 
+    flexDirection:"row",
+    alignItems: "center", 
+    borderRadius:"10px",
+    border: "2px solid",
+    gap : "3%",
+    borderColor :COLORS.black,
+    backgroundColor:COLORS.brown,
+  },
+  textInput : {
+    width : "50%",
+    borderRadius:"15px",
+    padding: "2%",
+  },
+  button : {
+    padding : "2%",
+    borderRadius:"15px", 
+    border:"0px", 
+    cursor:"pointer",
+    background:COLORS.black, 
+    color: COLORS.white,
+  },
 }
   
 export default Audience;
