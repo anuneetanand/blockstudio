@@ -2,19 +2,53 @@ import React from "react"
 import {COLORS} from "./Colors"
 import SongCard from "./SongCard"
 import AddSongCard from "./AddSongCard"
+import Loader from "react-loader-spinner"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMicrophone, faPlusSquare } from '@fortawesome/free-solid-svg-icons'
 
 class Artist extends React.Component {
 
     constructor(props){
-      super(props)
-      this.state = {form : false}
+      super(props);
+      this.state = {name: "", artistID: "", rating: "", songIDs: [], songs: [], form : false}
       this.openForm = this.openForm.bind(this)
       this.closeForm = this.closeForm.bind(this)
     }
   
     componentDidMount(){
+        this.loadArtistDetails().then(() =>{ console.log("Loaded Artist's Details")
+            this.loadSongDetails().then(() =>{ console.log("Loaded Artist's Songs")})
+        })
+    }
+
+    async loadArtistDetails(){
+        const contractInstance = await this.props.contract.deployed()
+        const artistDetails = await contractInstance.getArtistDetails({from:this.props.account})
+        let songList = []
+        for (let i = 0; i < artistDetails[3].length; i++){
+            songList.push(artistDetails[3][i].toString())
+        }
+        this.setState({
+            name:artistDetails[0].toString(),
+            artistID:artistDetails[1].toString(),
+            rating:artistDetails[2].toString(),
+            songIDs:songList
+        })   
+    }
+
+    async loadSongDetails(){
+        const contractInstance = await this.props.contract.deployed();
+        let songInfoList = []
+        for(let i = 0; i < this.state.songIDs.length; i++){
+            let songDetails = await contractInstance.getSongDetails(this.state.songIDs[i], {from:this.props.account});
+            songInfoList.push({
+                'name': songDetails[0],
+                'genre': songDetails[2],
+                'hash': songDetails[3],
+                'cost': songDetails[4].toString()
+            });
+        }
+        this.setState({songs:songInfoList})
     }
 
     openForm(){
@@ -26,18 +60,40 @@ class Artist extends React.Component {
     }
 
     render(){
-        return (
-            <div style = {styles.main}>
-                <h1><FontAwesomeIcon icon={faMicrophone}/></h1>
-                <h1> Artist </h1>
-                <div style = {styles.box}>
-                    <SongCard type = "artist" name = "Blinding Lights" genre = "Pop" cost = "50" likes = "25"/>
-                    <SongCard type = "artist" name = "Starboy" genre = "Pop" cost = "100" likes = "25"/>
+        
+        if (this.state.artistID === ""){
+            return (
+                <div style = {styles.main}>
+                  <Loader type = "Bars" color = {COLORS.black}/>
                 </div>
-                <h1><FontAwesomeIcon  icon={faPlusSquare} onClick = {()=>{this.openForm()}}/></h1>
-                <AddSongCard form = {this.state.form} closeForm = {this.closeForm}/>
-            </div>
-        )
+            )
+        }
+
+        else{
+            return (
+                <div style = {styles.main}>
+                    <div style = {styles.info}>
+                        <h1><FontAwesomeIcon icon={faMicrophone}/> {this.state.name}  </h1>
+                        <h3> Artist ID : {this.state.artistID} </h3>
+                        <h3> Rating : {this.state.rating} </h3>
+                    </div>
+                    <div style = {styles.box}>
+                        {this.state.songs.map((item,i)=> (
+                        <SongCard 
+                            type = {"artist"}
+                            name = {item.name}
+                            genre = {item.genre}
+                            cost = {item.cost}
+                            likes = {"0"}
+                            hash = {item.hash}
+                            key = {i}
+                        />))}
+                    </div>
+                    <h1><FontAwesomeIcon  icon={faPlusSquare} onClick = {()=>{this.openForm()}}/></h1>
+                    <AddSongCard contract = {this.props.contract} ipfs = {this.props.ipfs} account = {this.props.account} form = {this.state.form} closeForm = {this.closeForm}/>
+                </div>
+            )
+        }
     }
 }
   
@@ -50,6 +106,11 @@ const styles = {
         height:"100vh",
         gap :"5%",
         background:COLORS.brown,
+        },
+    info : {
+        display:"flex", 
+        flexDirection:"column", 
+        alignItems: "center", 
         },
     box : {
         height :"50%",

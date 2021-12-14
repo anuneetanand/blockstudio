@@ -43,6 +43,10 @@ contract blockstudio {
         songIDTracker = 0;
     }
     
+    function getNumSongs() public view returns(uint) {
+        return songIDTracker;
+    }
+
     function checkUser() public view returns(UserType) {
         return identifyUser[msg.sender];
     }
