@@ -1,3 +1,4 @@
+import Web3 from 'web3'
 import React from "react"
 import {COLORS} from "./Colors"
 import SongCard from "./SongCard"
@@ -91,6 +92,7 @@ class Audience extends React.Component {
               window.location.reload()
           })
       }
+      console.log("Submitted")
     } 
 
 
