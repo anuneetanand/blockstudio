@@ -10,7 +10,7 @@ class Artist extends React.Component {
 
     constructor(props){
       super(props);
-      this.state = {name: "", artistID: "", rating: "", songIDs: [], songs: [], form : false}
+      this.state = {name: "", artistID: "", popularity: 0, songIDs: [], songs: [], form : false}
       this.openForm = this.openForm.bind(this)
       this.closeForm = this.closeForm.bind(this)
     }
@@ -25,13 +25,12 @@ class Artist extends React.Component {
         const contractInstance = await this.props.contract.deployed()
         const artistDetails = await contractInstance.getArtistDetails({from:this.props.account})
         let songList = []
-        for (let i = 0; i < artistDetails[3].length; i++){
-            songList.push(artistDetails[3][i].toString())
+        for (let i = 0; i < artistDetails[2].length; i++){
+            songList.push(artistDetails[2][i].toString())
         }
         this.setState({
             name:artistDetails[0].toString(),
             artistID:artistDetails[1].toString(),
-            rating:artistDetails[2].toString(),
             songIDs:songList
         })   
     }
@@ -48,6 +47,7 @@ class Artist extends React.Component {
                 'cost': songDetails[4].toString(),
                 'timesPurchased': songDetails[5].toString()
             });
+            this.state.popularity += parseInt(songDetails[5].toString());
         }
         console.log(songInfoList);
         this.setState({songs:songInfoList})
@@ -77,7 +77,7 @@ class Artist extends React.Component {
                     <div style = {styles.info}>
                         <h1><FontAwesomeIcon icon={faMicrophone}/> {this.state.name}  </h1>
                         <h3> Artist ID : {this.state.artistID} </h3>
-                        <h3> Rating : {this.state.rating} </h3>
+                        <h3> Popularity : {this.state.popularity} </h3>
                     </div>
                     <div style = {styles.box}>
                         {this.state.songs.map((item,i)=> (
