@@ -4,10 +4,13 @@ import SongCard from "./SongCard"
 import Loader from "react-loader-spinner"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeadphones, faStore, faUser, faGift } from '@fortawesome/free-solid-svg-icons'
+import Web3 from 'web3'
+
 class Audience extends React.Component {
 
     constructor(props){
       super(props)
+      this.web3 = new Web3(Web3.givenProvider || "http://localhost:7545")
       this.state = {name : "", audienceID: "", store : [], library: [], songsMapping: {}, supportArtistUsername:"", donation:""}
     }
   
@@ -82,9 +85,9 @@ class Audience extends React.Component {
 
     onSubmitClick = async (event)=>{
       event.preventDefault()
-      if(this.state.artistUsername){
+      if(this.state.supportArtistUsername){
           const contractInstance = await this.props.contract.deployed()
-          await contractInstance.donateArtist(this.state.supportArtistUsername, this.web3.utils.toWei(this.state.donation, 'milliether'), {from:this.props.account}).then(()=>{
+          await contractInstance.donateArtist(this.state.supportArtistUsername, {from:this.props.account, value:this.web3.utils.toWei(this.state.donation, 'milliether')}).then(()=>{
               window.location.reload()
           })
       }
