@@ -36,7 +36,7 @@ contract blockstudio {
     mapping (address => Audience) allAudience;
     mapping (uint => Song) allSongs;
     mapping (uint => uint) timesSongPurchased;
-
+    mapping (string => bool) songHashUsed;
     
     constructor() {
         audienceIDTracker = 0;
@@ -95,6 +95,7 @@ contract blockstudio {
     
     function addSong(string memory _name, string memory _genre, string memory _hash, uint _price) public {
         require(identifyUser[msg.sender] == UserType.ARTIST, "Not an artist.");
+        require(!songHashUsed[_hash], "Duplicate detected. Song hash already in use.");
         
         songIDTracker += 1;
         
@@ -111,6 +112,7 @@ contract blockstudio {
 
         allSongs[songIDTracker] = newSong;
         allArtists[msg.sender].songsPublished.push(songIDTracker);
+        songHashUsed[_hash] = true;
         
         emit songAdded(newSong.songID, newSong.songName, newSong.artistName, newSong.price);
     }
