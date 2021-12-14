@@ -35,6 +35,8 @@ contract blockstudio {
     mapping (address => Artist) allArtists;
     mapping (address => Audience) allAudience;
     mapping (uint => Song) allSongs;
+    mapping (uint => uint) timesSongPurchased;
+    mapping (string => bool) songHashUsed;
     
     constructor() {
         audienceIDTracker = 0;
@@ -93,6 +95,7 @@ contract blockstudio {
     
     function addSong(string memory _name, string memory _genre, string memory _hash, uint _price) public {
         require(identifyUser[msg.sender] == UserType.ARTIST, "Not an artist.");
+        require(!songHashUsed[_hash], "Duplicate detected. Song hash already in use.");
         
         songIDTracker += 1;
         
@@ -104,9 +107,12 @@ contract blockstudio {
         newSong.hash = _hash;
         newSong.price = _price;
         newSong.artistAddress = payable(msg.sender);
-        
+
+        timesSongPurchased[songIDTracker] = 0;
+
         allSongs[songIDTracker] = newSong;
         allArtists[msg.sender].songsPublished.push(songIDTracker);
+        songHashUsed[_hash] = true;
         
         emit songAdded(newSong.songID, newSong.songName, newSong.artistName, newSong.price);
     }
@@ -128,6 +134,7 @@ contract blockstudio {
         require(msg.sender.balance > msg.value, "Insufficient balance.");
 
         curSong.artistAddress.transfer(msg.value);
+        timesSongPurchased[_songID] += 1;
         
         allAudience[msg.sender].songsPurchased.push(_songID);
         allAudience[msg.sender].isSongPurchased[_songID] = true;
@@ -135,13 +142,15 @@ contract blockstudio {
         emit songPurchased(curSong.songID, curSong.songName, allAudience[msg.sender].name, msg.value);
     }
     
-    function getSongDetails(uint _songID) public view returns(string memory, string memory, string memory, string memory, uint){
+    function getSongDetails(uint _songID) public view returns(string memory, string memory, string memory, string memory, uint, uint){
         return (allSongs[_songID].songName, 
             allSongs[_songID].artistName, 
             allSongs[_songID].genre, 
             allSongs[_songID].hash,
-            allSongs[_songID].price
+            allSongs[_songID].price,
+            timesSongPurchased[_songID]
         );
     }
+
     
 }

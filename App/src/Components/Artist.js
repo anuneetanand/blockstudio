@@ -45,9 +45,11 @@ class Artist extends React.Component {
                 'name': songDetails[0],
                 'genre': songDetails[2],
                 'hash': songDetails[3],
-                'cost': songDetails[4].toString()
+                'cost': songDetails[4].toString(),
+                'timesPurchased': songDetails[5].toString()
             });
         }
+        console.log(songInfoList);
         this.setState({songs:songInfoList})
     }
 
@@ -84,7 +86,7 @@ class Artist extends React.Component {
                             name = {item.name}
                             genre = {item.genre}
                             cost = {item.cost}
-                            likes = {"0"}
+                            likes = {item.timesPurchased}
                             hash = {item.hash}
                             key = {i}
                         />))}

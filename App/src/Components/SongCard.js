@@ -46,7 +46,7 @@ class SongCard extends React.Component {
                 <div style = {styles.card}>
                     <h3> <FontAwesomeIcon icon={faCompactDisc} /> {this.props.name} </h3>
                     <h3> <FontAwesomeIcon icon={faTag} /> {this.props.genre} </h3>
-                    <h3> <FontAwesomeIcon icon={faCoins} /> {this.props.cost} </h3>
+                    <h3> <FontAwesomeIcon icon={faCoins} /> {this.props.cost/1000000000000000} </h3>
                     <h3> <FontAwesomeIcon icon={faHeart} /> {this.props.likes} </h3>
                 </div>    
             )
@@ -68,7 +68,7 @@ class SongCard extends React.Component {
                     <h3> <FontAwesomeIcon icon={faCompactDisc} /> {this.props.name} </h3>
                     <h3> <FontAwesomeIcon icon={faTag} /> {this.props.genre} </h3>
                     <h3> <FontAwesomeIcon icon={faMicrophone} /> {this.props.artist} </h3>
-                    <h3> <FontAwesomeIcon icon={faCoins} /> {this.props.cost} </h3>
+                    <h3> <FontAwesomeIcon icon={faCoins} /> {this.props.cost/1000000000000000} </h3>
                     <h3> <FontAwesomeIcon onClick={this.buySong} icon={faShoppingCart} /> </h3>
                 </div>
             )
