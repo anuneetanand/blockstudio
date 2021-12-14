@@ -44,32 +44,32 @@ class SongCard extends React.Component {
         if (this.props.type === "artist")
             return (
                 <div style = {styles.card}>
-                    <h3> <FontAwesomeIcon icon={faCompactDisc} /> {this.props.name} </h3>
-                    <h3> <FontAwesomeIcon icon={faTag} /> {this.props.genre} </h3>
-                    <h3> <FontAwesomeIcon icon={faCoins} /> {this.props.cost/1000000000000000} </h3>
-                    <h3> <FontAwesomeIcon icon={faHeart} /> {this.props.likes} </h3>
+                    <h4> <FontAwesomeIcon icon={faCompactDisc} /> {this.props.name} </h4>
+                    <h4> <FontAwesomeIcon icon={faTag} /> {this.props.genre} </h4>
+                    <h4> <FontAwesomeIcon icon={faCoins} /> {this.props.cost/1000000000000000} </h4>
+                    <h4> <FontAwesomeIcon icon={faHeart} /> {this.props.likes} </h4>
                 </div>    
             )
         else if (this.props.type === "audience")
             return (
                 <div style = {!this.state.playing? styles.card : styles.cardHiglight}>
-                    <h3> <FontAwesomeIcon icon={faCompactDisc}  spin = {this.state.playing}/> {this.props.name} </h3>
-                    <h3> <FontAwesomeIcon icon={faTag} /> {this.props.genre} </h3>
-                    <h3> <FontAwesomeIcon icon={faMicrophone} /> {this.props.artist} </h3>
+                    <h4> <FontAwesomeIcon icon={faCompactDisc}  spin = {this.state.playing}/> {this.props.name} </h4>
+                    <h4> <FontAwesomeIcon icon={faTag} /> {this.props.genre} </h4>
+                    <h4> <FontAwesomeIcon icon={faMicrophone} /> {this.props.artist} </h4>
                     {   this.state.playing? 
-                            <h3> <FontAwesomeIcon onClick={this.pauseSong} icon={faPause} /> </h3> 
-                        :   <h3> <FontAwesomeIcon onClick={this.playSong} icon={faPlay} /> </h3>
+                            <h4> <FontAwesomeIcon onClick={this.pauseSong} icon={faPause} /> </h4> 
+                        :   <h4> <FontAwesomeIcon onClick={this.playSong} icon={faPlay} /> </h4>
                     }
                 </div>    
             )
         else
             return (
                 <div style = {styles.card}>
-                    <h3> <FontAwesomeIcon icon={faCompactDisc} /> {this.props.name} </h3>
-                    <h3> <FontAwesomeIcon icon={faTag} /> {this.props.genre} </h3>
-                    <h3> <FontAwesomeIcon icon={faMicrophone} /> {this.props.artist} </h3>
-                    <h3> <FontAwesomeIcon icon={faCoins} /> {this.props.cost/1000000000000000} </h3>
-                    <h3> <FontAwesomeIcon onClick={this.buySong} icon={faShoppingCart} /> </h3>
+                    <h4> <FontAwesomeIcon icon={faCompactDisc} /> {this.props.name} </h4>
+                    <h4> <FontAwesomeIcon icon={faTag} /> {this.props.genre} </h4>
+                    <h4> <FontAwesomeIcon icon={faMicrophone} /> {this.props.artist} </h4>
+                    <h4> <FontAwesomeIcon icon={faCoins} /> {this.props.cost/1000000000000000} </h4>
+                    <h4> <FontAwesomeIcon onClick={this.buySong} icon={faShoppingCart} /> </h4>
                 </div>
             )
     }
