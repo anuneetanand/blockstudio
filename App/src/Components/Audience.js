@@ -108,12 +108,12 @@ class Audience extends React.Component {
         return (
             <div style = {styles.main}>
                 <div style = {styles.info}>
-                      <h1><FontAwesomeIcon icon={faHeadphones}/> {this.state.name}  </h1>
+                      <h2><FontAwesomeIcon icon={faHeadphones}/> {this.state.name}  </h2>
                       <h3> Audience ID : {this.state.audienceID} </h3>
                 </div>
                 <div style = {styles.area}>
                   <div style = {styles.library}>
-                    <h2 style = {{textAlign:"center"}}> <FontAwesomeIcon icon={faUser}/> Library </h2>
+                    <h3 style = {{textAlign:"center"}}> <FontAwesomeIcon icon={faUser}/> Library </h3>
                       {this.state.library.map((item,i)=> (
                           <SongCard 
                           type = {"audience"}
@@ -125,7 +125,7 @@ class Audience extends React.Component {
                           key = {i}/>))}
                   </div>
                   <div style = {styles.store}>
-                    <h2 style = {{textAlign:"center"}}> <FontAwesomeIcon icon={faStore}/> Store </h2>
+                    <h3 style = {{textAlign:"center"}}> <FontAwesomeIcon icon={faStore}/> Store </h3>
                       {this.state.store.map((item,i)=> (
                           <SongCard 
                           contract = {this.props.contract} ipfs = {this.props.ipfs} account = {this.props.account}
@@ -166,7 +166,7 @@ const styles = {
     flexDirection:"column", 
     justifyContent: "centre", 
     alignItems: "center", 
-    height:"100vh",
+    height:"110vh",
     gap :"5%",
     background:COLORS.brown,
     },
