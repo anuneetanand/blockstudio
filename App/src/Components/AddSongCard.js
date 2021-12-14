@@ -4,10 +4,12 @@ import Popup from 'reactjs-popup'
 import Loader from "react-loader-spinner"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMusic, faFileUpload } from '@fortawesome/free-solid-svg-icons'
+import Web3 from 'web3'
 
 class AddSongCard extends React.Component{
     constructor(props){
         super(props);
+        this.web3 = new Web3(Web3.givenProvider || "http://localhost:7545")
         this.state = {name : "", genre : "", cost: "", buffer: "", hash : "", loading: false}
     }
     
@@ -29,7 +31,7 @@ class AddSongCard extends React.Component{
             const songHash = file["path"];
             this.setState({hash: songHash});
             const contractInstance = await this.props.contract.deployed()
-            await contractInstance.addSong(this.state.name, this.state.genre, this.state.hash, this.state.cost, {from:this.props.account}).then(()=>{
+            await contractInstance.addSong(this.state.name, this.state.genre, this.state.hash, this.web3.utils.toWei(this.state.cost, 'milliether'), {from:this.props.account}).then(()=>{
                 this.setState({ loading: false })
                 this.props.closeForm()
                 window.location.reload()
