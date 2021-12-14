@@ -40,7 +40,7 @@ contract blockstudio {
     mapping(uint256 => Song) allSongs;
     mapping(uint256 => uint256) timesSongPurchased;
     mapping(string => bool) songHashUsed;
-    mapping(uint256 => address payable) getArtistAddress;
+    mapping(string => address payable) getArtistAddress;
 
     constructor() {
         audienceIDTracker = 0;
@@ -62,7 +62,7 @@ contract blockstudio {
         Artist memory newArtist;
         newArtist.name = _name;
         newArtist.artistID = artistIDTracker;
-        getArtistAddress[artistIDTracker] = payable(msg.sender);
+        getArtistAddress[_name] = payable(msg.sender);
 
         allArtists[msg.sender] = newArtist;
         identifyUser[msg.sender] = UserType.ARTIST;
@@ -193,18 +193,18 @@ contract blockstudio {
         );
     }
 
-    event artistDonated(uint256 artistID, string audienceName, uint256 amount);
+    event artistDonated(string artistName, string audienceName, uint256 amount);
 
-    function donateArtist(uint256 _artistID) public payable {
+    function donateArtist(string memory artistName) public payable {
         require(
             identifyUser[msg.sender] == UserType.AUDIENCE,
             "Not an audience member."
         );
         require(msg.sender.balance > msg.value, "Insufficient balance.");
 
-        getArtistAddress[_artistID].transfer(msg.value);
+        getArtistAddress[artistName].transfer(msg.value);
 
-        emit artistDonated(_artistID, allAudience[msg.sender].name, msg.value);
+        emit artistDonated(artistName, allAudience[msg.sender].name, msg.value);
     }
 
     function getSongDetails(uint256 _songID)
