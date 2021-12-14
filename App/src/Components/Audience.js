@@ -5,7 +5,6 @@ import SongCard from "./SongCard"
 import Loader from "react-loader-spinner"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeadphones, faStore, faUser, faGift } from '@fortawesome/free-solid-svg-icons'
-import Web3 from 'web3'
 
 class Audience extends React.Component {
 
